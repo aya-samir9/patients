@@ -6,19 +6,26 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.patients.databinding.ActivityMainBinding
+import android.content.SharedPreferences
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private var totalAmount = 350000
-    private var totalDonors = 799
+    private var totalAmount = 380000
+    private var totalDonors = 793
     private val goalAmount = 500000
     private var isSaved = false
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        sharedPreferences = getSharedPreferences("DonationPrefs", MODE_PRIVATE)
+
+        totalAmount = sharedPreferences.getInt("totalAmount", 380000)
+        totalDonors = sharedPreferences.getInt("totalDonors", 793)
 
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
@@ -55,6 +62,7 @@ class MainActivity : AppCompatActivity() {
                 if (amount != null && amount > 0) {
                     totalAmount += amount
                     totalDonors++
+                    saveData()
                     updateUI()
                     Toast.makeText(this, "Thank you for your donation!", Toast.LENGTH_SHORT).show()
                 } else {
@@ -65,6 +73,13 @@ class MainActivity : AppCompatActivity() {
 
         builder.setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
         builder.show()
+    }
+
+    private fun saveData() {
+        val editor = sharedPreferences.edit()
+        editor.putInt("totalAmount", totalAmount)
+        editor.putInt("totalDonors", totalDonors)
+        editor.apply()
     }
 
     private fun updateUI() {
